@@ -1,0 +1,8 @@
+# Caddy: recebe os acessos da internet, cuida do HTTPS (cadeado) sozinho
+# e repassa tudo para o Castilho AI, que roda só dentro do servidor (porta 8000).
+# Instalação: cp deploy/Caddyfile /etc/caddy/Caddyfile
+# Troque seudominio.com.br pelo seu domínio.
+
+seudominio.com.br {
+	reverse_proxy 127.0.0.1:8000
+}

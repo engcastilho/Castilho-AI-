@@ -14,6 +14,16 @@
     <aside class="sidebar" id="sidebar">
       <button class="new-chat" id="new-chat" type="button">+ Nova conversa</button>
       <nav class="conversations" id="conversations" aria-label="Conversas"></nav>
+      <footer class="user-box">
+        <div class="user-info">
+          <strong id="user-name"></strong>
+          <span id="user-usage"></span>
+        </div>
+        <div class="user-actions">
+          <a href="/admin" id="admin-link" class="link hidden">Usuários</a>
+          <button type="button" id="logout" class="link">Sair</button>
+        </div>
+      </footer>
     </aside>
 
     <main class="chat">

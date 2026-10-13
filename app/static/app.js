@@ -13,6 +13,10 @@ const els = {
   input: $("input"),
   send: $("send"),
   stop: $("stop"),
+  userName: $("user-name"),
+  userUsage: $("user-usage"),
+  adminLink: $("admin-link"),
+  logout: $("logout"),
 };
 
 const state = {
@@ -92,13 +96,32 @@ function autoResize() {
 
 // ---------- API ----------
 
+// Mensagem de erro enviada pelo servidor ({"detail": "..."}), ou uma genérica.
+async function errorDetail(res) {
+  const data = await res.json().catch(() => ({}));
+  return typeof data.detail === "string" ? data.detail : `Erro ${res.status}. Tente novamente.`;
+}
+
 async function api(path, options = {}) {
   const res = await fetch(path, {
     headers: { "Content-Type": "application/json" },
     ...options,
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (res.status === 401) {
+    window.location.href = "/login"; // sessão expirou
+    throw new Error("Sessão expirada");
+  }
+  if (!res.ok) throw new Error(await errorDetail(res));
   return res.status === 204 ? null : res.json();
+}
+
+async function loadUser() {
+  const me = await api("/api/auth/me");
+  els.userName.textContent = me.username;
+  els.userUsage.textContent = me.daily_limit
+    ? `${me.used_today} de ${me.daily_limit} mensagens nas últimas 24h`
+    : "Sem limite de mensagens";
+  els.adminLink.classList.toggle("hidden", !me.is_admin);
 }
 
 async function loadConversations() {
@@ -179,7 +202,14 @@ async function sendMessage(text) {
       body: JSON.stringify({ content: text }),
       signal: state.controller.signal,
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (res.status === 401) {
+      window.location.href = "/login";
+      return;
+    }
+    if (!res.ok) {
+      rollback(await errorDetail(res)); // ex.: limite diário atingido
+      return;
+    }
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
@@ -207,7 +237,7 @@ async function sendMessage(text) {
           if (!answer.trim()) addMessage("notice", "O modelo não retornou texto. Tente reformular a pergunta.");
           if (ev.stop_reason === "max_tokens") addMessage("notice", "A resposta atingiu o limite de tamanho e foi cortada.");
           if (ev.title) els.title.textContent = ev.title;
-          await loadConversations();
+          await Promise.all([loadConversations(), loadUser()]);
         } else if (ev.type === "error") {
           rollback(ev.message);
         }
@@ -245,6 +275,12 @@ els.input.addEventListener("input", autoResize);
 els.stop.addEventListener("click", () => state.controller?.abort());
 els.newChat.addEventListener("click", newConversation);
 els.menuToggle.addEventListener("click", () => els.sidebar.classList.toggle("open"));
+els.logout.addEventListener("click", async () => {
+  await fetch("/api/auth/logout", { method: "POST" });
+  window.location.href = "/login";
+});
 
-loadConversations().catch(() => addMessage("error", "Não foi possível carregar as conversas."));
+Promise.all([loadUser(), loadConversations()]).catch(() =>
+  addMessage("error", "Não foi possível carregar as conversas."),
+);
 els.input.focus();

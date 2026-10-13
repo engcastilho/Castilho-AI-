@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar · Castilho AI</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/login.js" defer></script>
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <h1>Castilho AI</h1>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab active" id="tab-login" role="tab" aria-selected="true">Entrar</button>
+      <button type="button" class="tab" id="tab-register" role="tab" aria-selected="false">Criar conta</button>
+    </div>
+
+    <form id="auth-form" novalidate>
+      <label for="username">Usuário</label>
+      <input id="username" name="username" autocomplete="username" required>
+
+      <label for="password">Senha</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <p class="field-hint hidden" id="password-hint">Mínimo de 8 caracteres.</p>
+
+      <p class="form-message" id="form-message" role="alert"></p>
+      <button type="submit" class="primary" id="submit">Entrar</button>
+    </form>
+  </main>
+</body>
+</html>
