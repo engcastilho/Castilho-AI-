@@ -176,6 +176,11 @@ class Storage:
             )
         return conv
 
+    def claim_orphan_conversations(self, user_id: int) -> None:
+        """Passa para um usuário as conversas criadas antes de existir login."""
+        with self._connect() as conn:
+            conn.execute("UPDATE conversations SET user_id = ? WHERE user_id IS NULL", (user_id,))
+
     def list_conversations(self, user_id: int) -> list[dict[str, Any]]:
         with self._connect() as conn:
             rows = conn.execute(

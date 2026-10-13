@@ -249,9 +249,20 @@ def test_old_database_is_migrated(tmp_path):
     conn.commit()
     conn.close()
 
-    Storage(str(db))
+    conn = sqlite3.connect(db)
+    conn.execute("INSERT INTO conversations VALUES ('antiga', 'Conversa antiga', 'sys', 0, 0)")
+    conn.commit()
+    conn.close()
+
+    storage = Storage(str(db))
     cols = [r[1] for r in sqlite3.connect(db).execute("PRAGMA table_info(conversations)")]
     assert "user_id" in cols
+
+    # A primeira conta criada herda as conversas da época sem login.
+    app = create_app(settings=Settings(db_path=str(db)), storage=storage, model=FakeModel())
+    client = TestClient(app)
+    register(client, "admin")
+    assert [c["id"] for c in client.get("/api/conversations").json()] == ["antiga"]
 
 
 def test_cli_reset_password_and_make_admin(make_app, tmp_path, monkeypatch, capsys):

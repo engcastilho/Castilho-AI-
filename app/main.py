@@ -149,6 +149,8 @@ def create_app(
         except sqlite3.IntegrityError:
             raise HTTPException(409, "Esse nome de usuário já está em uso.") from None
 
+        if first_user:
+            storage.claim_orphan_conversations(user["id"])
         if not approved:
             return {"status": "pending", "message": "Conta criada! Aguarde o administrador aprovar seu acesso."}
         start_session(response, user["id"])
