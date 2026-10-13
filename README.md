@@ -40,6 +40,10 @@ uvicorn app.main:app --reload
 
 Abra <http://localhost:8000> no navegador.
 
+**No Windows, depois da primeira instalação**, basta dar dois cliques no arquivo
+`iniciar.bat`: ele liga o servidor e abre o navegador sozinho. Para desligar, feche a
+janela preta.
+
 ## Personalização
 
 Tudo é configurável pelo arquivo `.env`:
