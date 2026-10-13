@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Castilho AI</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/vendor/marked.min.js" defer></script>
+  <script src="/static/vendor/purify.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <button class="new-chat" id="new-chat" type="button">+ Nova conversa</button>
+      <nav class="conversations" id="conversations" aria-label="Conversas"></nav>
+    </aside>
+
+    <main class="chat">
+      <header class="chat-header">
+        <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Abrir conversas">☰</button>
+        <h1 id="chat-title">Castilho AI</h1>
+      </header>
+
+      <section class="messages" id="messages" aria-live="polite">
+        <div class="empty" id="empty">
+          <h2>Como posso ajudar hoje?</h2>
+          <p>Escreva uma mensagem abaixo para começar.</p>
+        </div>
+      </section>
+
+      <form class="composer" id="composer">
+        <textarea id="input" rows="1" placeholder="Envie uma mensagem…" autocomplete="off" required></textarea>
+        <button type="submit" id="send" aria-label="Enviar">➤</button>
+        <button type="button" id="stop" class="hidden" aria-label="Parar">■</button>
+      </form>
+      <p class="hint">Enter envia · Shift+Enter quebra linha · A IA pode cometer erros.</p>
+    </main>
+  </div>
+</body>
+</html>
