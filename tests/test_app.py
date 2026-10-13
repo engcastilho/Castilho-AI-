@@ -252,3 +252,22 @@ def test_old_database_is_migrated(tmp_path):
     Storage(str(db))
     cols = [r[1] for r in sqlite3.connect(db).execute("PRAGMA table_info(conversations)")]
     assert "user_id" in cols
+
+
+def test_cli_reset_password_and_make_admin(make_app, tmp_path, monkeypatch, capsys):
+    from app import cli
+
+    _, new_client = admin_client(make_app, registration="open")
+    register(new_client(), "joao")
+
+    monkeypatch.setattr(cli, "settings", Settings(db_path=str(tmp_path / "chat.db")))
+    monkeypatch.setattr(cli.getpass, "getpass", lambda prompt="": "nova-senha-456")
+    cli.main(["reset-password", "admin"])
+    cli.main(["make-admin", "joao"])
+    cli.main(["list-users"])
+    out = capsys.readouterr().out
+    assert "Senha de 'admin' alterada." in out and "'joao' agora é administrador." in out
+
+    client = new_client()
+    assert login(client, "admin").status_code == 401
+    assert login(client, "admin", "nova-senha-456").status_code == 200

@@ -121,6 +121,15 @@ class Storage:
                 conn.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
         return cur.rowcount > 0
 
+    def set_password(self, user_id: int, password_hash: str) -> None:
+        with self._connect() as conn:
+            conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (password_hash, user_id))
+            conn.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))  # desconecta tudo
+
+    def make_admin(self, user_id: int) -> None:
+        with self._connect() as conn:
+            conn.execute("UPDATE users SET is_admin = 1, is_approved = 1 WHERE id = ?", (user_id,))
+
     def delete_user(self, user_id: int) -> bool:
         with self._connect() as conn:
             cur = conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
